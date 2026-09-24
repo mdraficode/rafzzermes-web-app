@@ -198,6 +198,21 @@ describe('App (rendered in jsdom)', () => {
     relay.dispose();
   });
 
+  it('explains an unreachable relay on login rather than showing "Failed to fetch"', async () => {
+    const { relay } = mount(async () => {
+      throw new TypeError('Failed to fetch');
+    });
+    await waitFor(() => expect(screen.queryByText('Restoring session…')).toBeNull());
+
+    fireEvent.change(screen.getByLabelText('Username'), { target: { value: 'rafi' } });
+    fireEvent.change(screen.getByLabelText('Password'), { target: { value: 'secret' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Log In' }));
+
+    expect(await screen.findByText(/Could not reach the relay/)).toBeDefined();
+    expect(screen.queryByText('Failed to fetch')).toBeNull();
+    relay.dispose();
+  });
+
   it('opens the settings sheet and reports the resolved relay endpoint', async () => {
     const { relay } = mount(fakeFetch([]));
     await waitFor(() => expect(screen.queryByText('Restoring session…')).toBeNull());
