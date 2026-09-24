@@ -80,13 +80,6 @@ export class AppConfig {
   static get relayBaseUrl(): string {
     return readStoredRelayBaseUrl() ?? DEFAULT_RELAY_BASE_URL;
   }
-
-  /** True when the relay URL came from the build or an override, not the fallback. */
-  static get hasConfiguredRelay(): boolean {
-    return (
-      readStoredRelayBaseUrl() !== null || COMPILE_TIME_RELAY_BASE_URL.length > 0
-    );
-  }
 }
 
 /** Hostnames browsers treat as trustworthy even over plain HTTP. */

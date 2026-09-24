@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { useNotifier } from '../../core/useNotifier';
 import { pageIsInsecure } from '../../core/config';
+import { describeTransportFailure } from '../../core/errors';
 import { persistentStorageAvailable } from '../../core/storage';
 import type { RelayProvider } from '../../core/relayProvider';
 import type { ThemeController } from '../../ui/theme';
@@ -65,7 +66,7 @@ export function LoginScreen({ relay, theme, onOpenSettings }: LoginScreenProps) 
       // not connect again here, or the handshake in flight is replaced.
       setPassword('');
     } catch (error) {
-      setFailure(error instanceof Error ? error.message : String(error));
+      setFailure(describeTransportFailure(error));
     } finally {
       setLoading(false);
     }

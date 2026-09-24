@@ -156,7 +156,7 @@ These were open WebSocket/UI issues in the Android source. Each has a regression
 
 ## Tests
 
-`npm test` — 75 tests, no network and no browser required.
+`npm test` — 76 tests, no network and no browser required.
 
 - `tests/relayClient.test.ts` — URL normalisation, `ws`/`wss` derivation, SSE framing
   (`\n`, `\r\n`, bare `\r`, CRLF split across chunks, keep-alive comments, unterminated

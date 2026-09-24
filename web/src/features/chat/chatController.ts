@@ -1,5 +1,6 @@
 import { ChangeNotifier } from '../../core/notifier';
 import { RelayHttpError, type RelayEvent } from '../../core/client/relayClient';
+import { describeTransportFailure } from '../../core/errors';
 import type { RelayProvider } from '../../core/relayProvider';
 
 export type MessageRole = 'user' | 'assistant' | 'status';
@@ -258,14 +259,7 @@ function formatStreamError(error: unknown): string {
   if (error instanceof RelayHttpError) return `Error: ${error.message}`;
   if (error instanceof Error) {
     if (error.name === 'AbortError') return 'Error: request cancelled';
-    if (error instanceof TypeError) {
-      // fetch() rejects with TypeError for CORS/TLS/DNS failures.
-      return (
-        'Error: could not reach the relay. It may be offline, or blocking this ' +
-        'origin (CORS) — see Settings → Relay endpoint.'
-      );
-    }
-    return `Error: ${error.message}`;
+    return `Error: ${describeTransportFailure(error)}`;
   }
   return `Error: ${String(error)}`;
 }
