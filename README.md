@@ -1,3 +1,25 @@
+# Rafzzermes App
+
+Clients for the Rafzzermes relay (WebSocket `/sync` + HTTP `/auth/login`, `/v1/chat`, `/v1/models`).
+
+This repository now contains **two front ends for the same relay**:
+
+| Project | Directory | Target | Entry point |
+|---|---|---|---|
+| **Rafzzermes App** | `lib/`, `android/` | Android APK (Flutter) | `lib/main.dart` |
+| **Rafzzermes Web App** | `web/` | Any modern browser | `web/index.html` |
+
+The web app is a feature-for-feature port of the Flutter client — same login screen, same
+chat behaviour, same wire protocol — not a reimplementation with a different design.
+
+**Live URL: <https://mdraficode.github.io/rafzzermes-web-app/>**
+
+See [`web/README.md`](web/README.md) for the web app's documentation and the
+[relay HTTPS requirement](web/README.md#read-this-first-the-relay-must-be-https),
+which is the one thing that must be in place before the deployed site can log in.
+
+---
+
 # Rafzzermes App — Flutter Project
 
 Android-only Flutter client for the Rafzzermes relay (WebSocket `/sync` + HTTP `/auth/login`, `/v1/chat`, `/v1/models`).

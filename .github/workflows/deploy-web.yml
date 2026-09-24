@@ -1,0 +1,74 @@
+name: Deploy Rafzzermes Web App
+
+# GitHub Pages for this repository is configured as "deploy from a branch",
+# source: gh-pages / (root). So the built web app is published by copying
+# web/dist into the branch root — no Pages settings change is required.
+#
+# Triggered only by changes under web/, and the commit it makes touches
+# index.html / assets/ / favicon.svg, so it cannot re-trigger itself.
+
+on:
+  push:
+    branches: [gh-pages]
+    paths:
+      - 'web/**'
+      - '.github/workflows/deploy-web.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: deploy-rafzzermes-web
+  cancel-in-progress: true
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+
+      - name: Install dependencies
+        working-directory: web
+        run: npm ci
+
+      - name: Test
+        working-directory: web
+        run: npm test
+
+      - name: Build
+        working-directory: web
+        env:
+          # Asset paths must match the Pages sub-path.
+          VITE_BASE: /rafzzermes-web-app/
+          # Optional: set a repository variable RELAY_BASE_URL to bake in the
+          # HTTPS relay endpoint, so the deployed bundle needs no setup step.
+          VITE_RELAY_BASE_URL: ${{ vars.RELAY_BASE_URL }}
+        run: npm run build
+
+      - name: Publish build to the branch root
+        run: |
+          set -euo pipefail
+          rsync -a --delete web/dist/assets/ assets/
+          cp web/dist/index.html index.html
+          cp web/dist/favicon.svg favicon.svg
+          # Keep Jekyll away from the built output.
+          touch .nojekyll
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A index.html favicon.svg assets .nojekyll
+
+          if git diff --cached --quiet; then
+            echo 'Build output is unchanged — nothing to publish.'
+            exit 0
+          fi
+
+          git commit -m 'Publish Rafzzermes Web App build [skip ci]'
+          git push
